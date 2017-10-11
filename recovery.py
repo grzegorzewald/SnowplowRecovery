@@ -5,6 +5,7 @@ import sys
 import argparse
 import gzip
 import base64
+import json
 import boto3
 import thriftpy
 from thriftpy.protocol import TCyBinaryProtocolFactory
@@ -29,6 +30,7 @@ def emit_to_kinesis(record, key):
         Data=record,
         PartitionKey=key
     )
+
 
 emitters = {
     "stdout": emit_to_stdout,
@@ -59,8 +61,8 @@ def process_gzfile(gz_file_name):
     with gzip.open(gz_file_name, 'rb') as f:
         record = bytearray(f.read(6))
         byte = f.read(1)
-        while byte != "":
-            record.append(byte)
+        while len(byte) == 1:
+            record.append(ord(byte))
             if record.endswith(RECORD_START_SEQUENCE):
                 process_record(record[:-6])
                 record = bytearray(RECORD_START_SEQUENCE)
