@@ -20,6 +20,11 @@ collector = thriftpy.load("collector-payload.thrift")
 collector_payload = collector.CollectorPayload()
 
 
+def emit_to_null(record, _):
+    del record
+    pass
+
+
 def emit_to_stdout(record, _):
     print(base64.b64encode(str(record)))
 
@@ -33,6 +38,7 @@ def emit_to_kinesis(record, key):
 
 
 emitters = {
+    "null": emit_to_null,
     "stdout": emit_to_stdout,
     "kinesis": emit_to_kinesis
 }
